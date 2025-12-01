@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { apiClient } from '../lib/api';
 import { tokenService, userService } from '../lib/auth';
 import { API_ENDPOINTS } from '../config/api';
-import type { User, LoginCredentials, RegisterData } from '../types';
+import type { User, LoginCredentials, RegisterData, AuthResponse } from '../types';
 
 interface AuthContextType {
   user: User | null;
@@ -39,11 +39,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const hasValidToken = tokenService.isAuthenticated();
 
       if (storedUser && hasValidToken) {
-        // Verify token with server
-        const response = await apiClient.get<User>(API_ENDPOINTS.AUTH.ME);
-        if (response.success && response.data) {
-          setUser(response.data);
-          userService.setUser(response.data);
+        // Verify token with server by fetching profile
+        const response = await apiClient.get<{ user: User }>(API_ENDPOINTS.AUTH.PROFILE);
+        if (response.success && response.data?.user) {
+          setUser(response.data.user);
+          userService.setUser(response.data.user);
         } else {
           // Invalid token, clear auth
           tokenService.clearTokens();
@@ -61,17 +61,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
-      const response = await apiClient.post<{
-        user: User;
-        accessToken: string;
-        refreshToken?: string;
-      }>(API_ENDPOINTS.AUTH.LOGIN, credentials);
+      const response = await apiClient.post<AuthResponse>(
+        API_ENDPOINTS.AUTH.LOGIN,
+        credentials
+      );
 
       if (response.success && response.data) {
-        const { user, accessToken, refreshToken } = response.data;
-        
-        // Store tokens and user
-        tokenService.setTokens(accessToken, refreshToken);
+        const { user, token } = response.data;
+
+        // Store token and user
+        tokenService.setTokens(token);
         userService.setUser(user);
         setUser(user);
       } else {
@@ -85,17 +84,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (data: RegisterData): Promise<void> => {
     try {
-      const response = await apiClient.post<{
-        user: User;
-        accessToken: string;
-        refreshToken?: string;
-      }>(API_ENDPOINTS.AUTH.REGISTER, data);
+      const response = await apiClient.post<AuthResponse>(
+        API_ENDPOINTS.AUTH.REGISTER,
+        data
+      );
 
       if (response.success && response.data) {
-        const { user, accessToken, refreshToken } = response.data;
-        
-        // Store tokens and user
-        tokenService.setTokens(accessToken, refreshToken);
+        const { user, token } = response.data;
+
+        // Store token and user
+        tokenService.setTokens(token);
         userService.setUser(user);
         setUser(user);
       } else {
@@ -108,15 +106,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = (): void => {
-    try {
-      // Call logout endpoint (fire and forget)
-      apiClient.post(API_ENDPOINTS.AUTH.LOGOUT).catch(console.error);
-    } finally {
-      // Clear local state regardless of API call result
-      tokenService.clearTokens();
-      userService.clearUser();
-      setUser(null);
-    }
+    // Clear local state
+    tokenService.clearTokens();
+    userService.clearUser();
+    setUser(null);
   };
 
   const updateUser = (updates: Partial<User>): void => {
@@ -129,10 +122,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async (): Promise<void> => {
     try {
-      const response = await apiClient.get<User>(API_ENDPOINTS.AUTH.ME);
-      if (response.success && response.data) {
-        setUser(response.data);
-        userService.setUser(response.data);
+      const response = await apiClient.get<{ user: User }>(API_ENDPOINTS.AUTH.PROFILE);
+      if (response.success && response.data?.user) {
+        setUser(response.data.user);
+        userService.setUser(response.data.user);
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);

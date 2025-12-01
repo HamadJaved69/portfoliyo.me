@@ -8,15 +8,21 @@ export interface ApiResponse<T = any> {
 
 // User types
 export interface User {
-  id: number;
+  id: string;
   email: string;
-  username: string;
-  firstName?: string;
-  lastName?: string;
+  username: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  avatar: string | null;
   emailVerified: boolean;
+  isActive: boolean;
+  role: string;
   createdAt: string;
-  updatedAt: string;
-  lastLogin?: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
 }
 
 export interface LoginCredentials {
@@ -26,80 +32,144 @@ export interface LoginCredentials {
 
 export interface RegisterData {
   email: string;
-  username: string;
   password: string;
+  username?: string;
   firstName?: string;
   lastName?: string;
 }
 
 export interface UpdateProfileData {
+  username?: string;
   firstName?: string;
   lastName?: string;
-  username: string;
+  avatar?: string;
 }
+
+export interface ChangePasswordData {
+  oldPassword: string;
+  newPassword: string;
+}
+
+// Template types
+export type TemplateId = 'minimal' | 'modern' | 'developer';
 
 // Portfolio types
-export interface PersonalInfo {
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  location: string;
-  website?: string;
-  github?: string;
-  linkedin?: string;
-  summary: string;
+export interface Portfolio {
+  id: string;
+  userId: string;
+  title: string | null;
+  bio: string | null;
+  tagline: string | null;
+  template: TemplateId;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  location: string | null;
+  websiteUrl: string | null;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  twitterUrl: string | null;
+  skills: string[];
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+  projects: Project[];
+  experiences: Experience[];
+  education: Education[];
 }
 
-export interface Experience {
-  id?: number;
-  title: string;
-  company: string;
-  duration: string;
-  description: string[];
-}
-
-export interface Education {
-  id?: number;
-  degree: string;
-  institution: string;
-  year: string;
+export interface CreatePortfolioData {
+  title?: string;
+  bio?: string;
+  tagline?: string;
+  template?: TemplateId;
+  contactEmail?: string;
+  contactPhone?: string;
+  location?: string;
+  websiteUrl?: string;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  twitterUrl?: string;
+  skills?: string[];
 }
 
 export interface Project {
-  id?: number;
+  id: string;
+  portfolioId: string;
   title: string;
-  description: string;
+  description: string | null;
+  imageUrl: string | null;
+  projectUrl: string | null;
+  githubUrl: string | null;
   technologies: string[];
-  link?: string;
-}
-
-export interface Portfolio {
-  id: number;
-  userId: number;
-  title: string;
-  slug: string;
-  templateId?: string; // Template identifier (minimal, modern, developer)
-  personalInfo: PersonalInfo;
-  experience: Experience[];
-  education: Education[];
-  skills: string[];
-  projects: Project[];
-  isPublic: boolean;
-  viewCount: number;
+  featured: boolean;
+  order: number;
+  startDate: string | null;
+  endDate: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface CreatePortfolioData {
+export interface CreateProjectData {
   title: string;
-  templateId?: string; // Template identifier
-  personalInfo: PersonalInfo;
-  experience: Experience[];
-  education: Education[];
-  skills: string[];
-  projects: Project[];
-  isPublic: boolean;
+  description?: string;
+  imageUrl?: string;
+  projectUrl?: string;
+  githubUrl?: string;
+  technologies?: string[];
+  featured?: boolean;
+  order?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface Experience {
+  id: string;
+  portfolioId: string;
+  company: string;
+  position: string;
+  description: string | null;
+  location: string | null;
+  current: boolean;
+  order: number;
+  startDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateExperienceData {
+  company: string;
+  position: string;
+  description?: string;
+  location?: string;
+  current?: boolean;
+  order?: number;
+  startDate: string;
+  endDate?: string | null;
+}
+
+export interface Education {
+  id: string;
+  portfolioId: string;
+  institution: string;
+  degree: string;
+  field: string | null;
+  description: string | null;
+  order: number;
+  startDate: string;
+  endDate: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateEducationData {
+  institution: string;
+  degree: string;
+  field?: string;
+  description?: string;
+  order?: number;
+  startDate: string;
+  endDate?: string | null;
 }
 
 // Analytics types

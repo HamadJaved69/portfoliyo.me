@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Globe, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Github, Linkedin, ExternalLink, Twitter } from 'lucide-react';
 import type { Portfolio } from '../types';
 
 interface TemplateProps {
@@ -7,8 +7,14 @@ interface TemplateProps {
   isPreview?: boolean;
 }
 
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
 const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false }) => {
-  const { personalInfo, experience, education, skills, projects } = portfolio;
+  const { experiences, education, skills, projects } = portfolio;
 
   return (
     <div className="min-h-screen bg-white text-black font-mono">
@@ -16,65 +22,78 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
       <header className="border-b border-black py-12">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
-            {personalInfo.name}
+            {portfolio.title || 'My Portfolio'}
           </h1>
-          <p className="text-xl text-gray-700 mb-4">{personalInfo.title}</p>
+          {portfolio.tagline && (
+            <p className="text-xl text-gray-700 mb-4">{portfolio.tagline}</p>
+          )}
 
           {/* Contact Info */}
           <div className="flex flex-wrap gap-4 text-sm">
-            {personalInfo.email && (
-              <a href={`mailto:${personalInfo.email}`} className="flex items-center hover:underline">
+            {portfolio.contactEmail && (
+              <a href={`mailto:${portfolio.contactEmail}`} className="flex items-center hover:underline">
                 <Mail className="w-4 h-4 mr-2" />
-                {personalInfo.email}
+                {portfolio.contactEmail}
               </a>
             )}
-            {personalInfo.phone && (
-              <a href={`tel:${personalInfo.phone}`} className="flex items-center hover:underline">
+            {portfolio.contactPhone && (
+              <a href={`tel:${portfolio.contactPhone}`} className="flex items-center hover:underline">
                 <Phone className="w-4 h-4 mr-2" />
-                {personalInfo.phone}
+                {portfolio.contactPhone}
               </a>
             )}
-            {personalInfo.location && (
+            {portfolio.location && (
               <span className="flex items-center">
                 <MapPin className="w-4 h-4 mr-2" />
-                {personalInfo.location}
+                {portfolio.location}
               </span>
             )}
           </div>
 
           {/* Links */}
           <div className="flex flex-wrap gap-4 mt-4 text-sm">
-            {personalInfo.website && (
+            {portfolio.websiteUrl && (
               <a
-                href={personalInfo.website}
+                href={portfolio.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:underline"
               >
                 <Globe className="w-4 h-4 mr-2" />
-                {personalInfo.website.replace(/^https?:\/\//, '')}
+                {portfolio.websiteUrl.replace(/^https?:\/\//, '')}
               </a>
             )}
-            {personalInfo.github && (
+            {portfolio.githubUrl && (
               <a
-                href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`}
+                href={portfolio.githubUrl.startsWith('http') ? portfolio.githubUrl : `https://${portfolio.githubUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:underline"
               >
                 <Github className="w-4 h-4 mr-2" />
-                {personalInfo.github.replace(/^https?:\/\//, '')}
+                GitHub
               </a>
             )}
-            {personalInfo.linkedin && (
+            {portfolio.linkedinUrl && (
               <a
-                href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}
+                href={portfolio.linkedinUrl.startsWith('http') ? portfolio.linkedinUrl : `https://${portfolio.linkedinUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center hover:underline"
               >
                 <Linkedin className="w-4 h-4 mr-2" />
-                {personalInfo.linkedin.replace(/^https?:\/\//, '')}
+                LinkedIn
+              </a>
+            )}
+            {portfolio.twitterUrl && (
+              <a
+                href={portfolio.twitterUrl.startsWith('http') ? portfolio.twitterUrl : `https://${portfolio.twitterUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center hover:underline"
+              >
+                <Twitter className="w-4 h-4 mr-2" />
+                Twitter
               </a>
             )}
           </div>
@@ -83,33 +102,32 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* About */}
-        {personalInfo.summary && (
+        {portfolio.bio && (
           <section className="mb-16">
             <h2 className="text-xl font-bold mb-6 uppercase tracking-wide">About</h2>
-            <p className="text-gray-700 leading-relaxed max-w-3xl">
-              {personalInfo.summary}
+            <p className="text-gray-700 leading-relaxed max-w-3xl whitespace-pre-line">
+              {portfolio.bio}
             </p>
           </section>
         )}
 
         {/* Experience */}
-        {experience.length > 0 && (
+        {experiences && experiences.length > 0 && (
           <section className="mb-16">
             <h2 className="text-xl font-bold mb-6 uppercase tracking-wide">Experience</h2>
             <div className="space-y-8">
-              {experience.map((exp, index) => (
-                <div key={index} className="border-l-2 border-black pl-6">
-                  <h3 className="text-lg font-bold">{exp.title}</h3>
+              {experiences.map((exp) => (
+                <div key={exp.id} className="border-l-2 border-black pl-6">
+                  <h3 className="text-lg font-bold">{exp.position}</h3>
                   <p className="text-gray-700 font-medium">{exp.company}</p>
-                  <p className="text-sm text-gray-500 mb-3">{exp.duration}</p>
-                  {exp.description && exp.description.length > 0 && (
-                    <div className="space-y-2">
-                      {exp.description.map((desc, i) => (
-                        <p key={i} className="text-gray-700 text-sm leading-relaxed">
-                          • {desc}
-                        </p>
-                      ))}
-                    </div>
+                  <p className="text-sm text-gray-500 mb-3">
+                    {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
+                    {exp.location && ` • ${exp.location}`}
+                  </p>
+                  {exp.description && (
+                    <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
+                      {exp.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -118,15 +136,20 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
         )}
 
         {/* Education */}
-        {education.length > 0 && (
+        {education && education.length > 0 && (
           <section className="mb-16">
             <h2 className="text-xl font-bold mb-6 uppercase tracking-wide">Education</h2>
             <div className="space-y-4">
-              {education.map((edu, index) => (
-                <div key={index} className="border-l-2 border-gray-300 pl-6">
-                  <h3 className="font-bold">{edu.degree}</h3>
+              {education.map((edu) => (
+                <div key={edu.id} className="border-l-2 border-gray-300 pl-6">
+                  <h3 className="font-bold">{edu.degree}{edu.field && ` in ${edu.field}`}</h3>
                   <p className="text-gray-700">{edu.institution}</p>
-                  <p className="text-sm text-gray-500">{edu.year}</p>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(edu.startDate)} - {formatDate(edu.endDate) || 'Present'}
+                  </p>
+                  {edu.description && (
+                    <p className="text-gray-600 text-sm mt-2">{edu.description}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -134,7 +157,7 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
         )}
 
         {/* Skills */}
-        {skills.length > 0 && (
+        {skills && skills.length > 0 && (
           <section className="mb-16">
             <h2 className="text-xl font-bold mb-6 uppercase tracking-wide">Skills</h2>
             <div className="flex flex-wrap gap-2">
@@ -151,29 +174,43 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
         )}
 
         {/* Projects */}
-        {projects.length > 0 && (
+        {projects && projects.length > 0 && (
           <section className="mb-16">
             <h2 className="text-xl font-bold mb-6 uppercase tracking-wide">Projects</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {projects.map((project, index) => (
-                <div key={index} className="border border-black p-6 bg-white">
+              {projects.map((project) => (
+                <div key={project.id} className="border border-black p-6 bg-white">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-lg font-bold">{project.title}</h3>
-                    {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-black hover:text-gray-600 transition-colors"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                      </a>
-                    )}
+                    <div className="flex gap-2">
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-black hover:text-gray-600 transition-colors"
+                        >
+                          <Github className="w-5 h-5" />
+                        </a>
+                      )}
+                      {project.projectUrl && (
+                        <a
+                          href={project.projectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-black hover:text-gray-600 transition-colors"
+                        >
+                          <ExternalLink className="w-5 h-5" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-gray-700 text-sm mb-4 leading-relaxed">
-                    {project.description}
-                  </p>
-                  {project.technologies.length > 0 && (
+                  {project.description && (
+                    <p className="text-gray-700 text-sm mb-4 leading-relaxed">
+                      {project.description}
+                    </p>
+                  )}
+                  {project.technologies && project.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       {project.technologies.map((tech, i) => (
                         <span
@@ -196,7 +233,7 @@ const MinimalTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false
       <footer className="border-t border-black py-8 mt-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} {personalInfo.name}
+            © {new Date().getFullYear()} {portfolio.title}
           </p>
           {!isPreview && (
             <p className="text-xs text-gray-400 mt-2">

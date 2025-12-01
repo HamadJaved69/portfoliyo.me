@@ -201,7 +201,7 @@ const Examples = () => {
                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 <div className="flex-1 text-center text-sm text-gray-600">
-                  portfoliyo.me/@{samplePortfolio.personalInfo.name.toLowerCase().replace(/\s+/g, '')}
+                  portfoliyo.me/@{currentTemplate.preview.name.toLowerCase().replace(/\s+/g, '')}
                 </div>
                 <Eye className="w-4 h-4 text-gray-400" />
               </div>

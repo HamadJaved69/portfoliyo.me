@@ -112,7 +112,7 @@ export const validateLoginForm = (data: { email: string; password: string }): Va
 
 export const validateRegisterForm = (data: {
   email: string;
-  username: string;
+  username?: string;
   password: string;
   confirmPassword: string;
   firstName?: string;
@@ -120,23 +120,23 @@ export const validateRegisterForm = (data: {
 }): ValidationError[] => {
   const errors = validateForm(data, {
     email: validateEmail,
-    username: validateUsername,
+    username: (value) => value ? validateUsername(value) : null,
     password: validatePassword,
     confirmPassword: (value) => validatePasswordConfirmation(data.password, value),
     firstName: (value) => value ? validateMinLength(value, 1) : null,
     lastName: (value) => value ? validateMinLength(value, 1) : null,
   });
-  
+
   return errors;
 };
 
 export const validateProfileForm = (data: {
   firstName?: string;
   lastName?: string;
-  username: string;
+  username?: string;
 }): ValidationError[] => {
   return validateForm(data, {
-    username: validateUsername,
+    username: (value) => value ? validateUsername(value) : null,
     firstName: (value) => value ? validateMinLength(value, 1) : null,
     lastName: (value) => value ? validateMinLength(value, 1) : null,
   });

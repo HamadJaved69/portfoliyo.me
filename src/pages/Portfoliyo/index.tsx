@@ -34,26 +34,19 @@ const Portfoliyo = () => {
         setLoading(true);
         setError(null);
 
-        // Track portfolio view
-        try {
-          await apiClient.post(API_ENDPOINTS.PUBLIC.TRACK_VIEW(cleanUsername));
-        } catch (viewError) {
-          // Don't fail if view tracking fails
-          console.warn('Failed to track portfolio view:', viewError);
-        }
-
-        // Fetch portfolio data
-        const response = await apiClient.get<Portfolio>(
-          API_ENDPOINTS.PUBLIC.PORTFOLIO(cleanUsername)
+        // Fetch portfolio data by user ID (username is the userId in this backend)
+        const response = await apiClient.get<{ portfolio: Portfolio }>(
+          API_ENDPOINTS.PORTFOLIO.PUBLIC(cleanUsername)
         );
 
-        if (response.success && response.data) {
-          // Only show public portfolios
-          if (!response.data.isPublic) {
+        if (response.success && response.data?.portfolio) {
+          const portfolioData = response.data.portfolio;
+          // Only show published portfolios
+          if (!portfolioData.isPublished) {
             setError('This portfolio is private');
             return;
           }
-          setPortfolio(response.data);
+          setPortfolio(portfolioData);
         } else {
           setError('Portfolio not found');
         }
@@ -151,9 +144,9 @@ const Portfoliyo = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Success - render portfolio with selected template
+  // Success - render portfolio with selected template (default to minimal)
   if (portfolio) {
-    const TemplateComponent = getTemplateComponent(portfolio.templateId || 'minimal');
+    const TemplateComponent = getTemplateComponent(portfolio.template || 'minimal');
     return <TemplateComponent portfolio={portfolio} />;
   }
 

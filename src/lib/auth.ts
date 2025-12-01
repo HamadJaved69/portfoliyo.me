@@ -6,20 +6,12 @@ class TokenService {
     return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
   }
 
-  getRefreshToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-  }
-
-  setTokens(accessToken: string, refreshToken?: string): void {
-    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    if (refreshToken) {
-      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-    }
+  setTokens(token: string): void {
+    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
   }
 
   clearTokens(): void {
     localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);
   }
 
@@ -29,8 +21,13 @@ class TokenService {
 
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-      return payload.exp > currentTime;
+      // If token has expiration, check it; otherwise just verify token exists and is valid
+      if (payload.exp) {
+        const currentTime = Date.now() / 1000;
+        return payload.exp > currentTime;
+      }
+      // Token without expiration - consider valid if it has required fields
+      return !!(payload.id || payload.email);
     } catch {
       return false;
     }
@@ -90,7 +87,10 @@ export const parseJWT = (token: string) => {
 export const isTokenExpired = (token: string): boolean => {
   const payload = parseJWT(token);
   if (!payload) return true;
-  
+
+  // If no expiration, token is not expired
+  if (!payload.exp) return false;
+
   const currentTime = Date.now() / 1000;
   return payload.exp < currentTime;
 };

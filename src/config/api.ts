@@ -1,6 +1,6 @@
 // API configuration
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   TIMEOUT: 10000,
   RETRY_ATTEMPTS: 3,
 } as const;
@@ -11,41 +11,40 @@ export const API_ENDPOINTS = {
   AUTH: {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    ME: '/auth/me',
-    VERIFY_EMAIL: '/auth/verify-email',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
+    PROFILE: '/auth/profile',
+    CHANGE_PASSWORD: '/auth/change-password',
   },
 
-  // Users
-  USERS: {
-    PROFILE: '/users/profile',
-    USERNAME: '/users/username',
-    DELETE: '/users/account',
-    CHANGE_PASSWORD: '/users/change-password',
+  // Portfolio
+  PORTFOLIO: {
+    CREATE: '/portfolio',
+    ME: '/portfolio/me',
+    UPDATE: '/portfolio',
+    DELETE: '/portfolio',
+    PUBLISH: '/portfolio/publish',
+    PUBLIC: (username: string) => `/portfolio/public/${username}`,
+    PUBLIC_BY_ID: (userId: string) => `/portfolio/public/id/${userId}`,
   },
 
-  // Portfolios
-  PORTFOLIOS: {
-    MY_PORTFOLIO: '/portfolios/me',
-    CREATE: '/portfolios',
-    UPDATE: (id: number) => `/portfolios/${id}`,
-    DELETE: (id: number) => `/portfolios/${id}`,
-    PUBLIC: (slug: string) => `/portfolios/public/${slug}`,
+  // Projects
+  PROJECTS: {
+    CREATE: '/portfolio/projects',
+    UPDATE: (projectId: string) => `/portfolio/projects/${projectId}`,
+    DELETE: (projectId: string) => `/portfolio/projects/${projectId}`,
   },
 
-  // Public
-  PUBLIC: {
-    PORTFOLIO: (username: string) => `/public/portfolio/${username}`,
-    TRACK_VIEW: (username: string) => `/public/portfolio/${username}/view`,
+  // Experiences
+  EXPERIENCES: {
+    CREATE: '/portfolio/experiences',
+    UPDATE: (experienceId: string) => `/portfolio/experiences/${experienceId}`,
+    DELETE: (experienceId: string) => `/portfolio/experiences/${experienceId}`,
   },
 
-  // Analytics
-  ANALYTICS: {
-    EVENT: '/analytics/event',
-    PORTFOLIO_STATS: (id: number) => `/analytics/portfolio/${id}`,
-    ADMIN_STATS: '/analytics/admin',
+  // Education
+  EDUCATION: {
+    CREATE: '/portfolio/education',
+    UPDATE: (educationId: string) => `/portfolio/education/${educationId}`,
+    DELETE: (educationId: string) => `/portfolio/education/${educationId}`,
   },
 } as const;
 
@@ -63,8 +62,7 @@ export const HTTP_STATUS = {
 
 // Local storage keys
 export const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'portfoliyo_access_token',
-  REFRESH_TOKEN: 'portfoliyo_refresh_token',
+  ACCESS_TOKEN: 'portfoliyo_token',
   USER: 'portfoliyo_user',
   THEME: 'portfoliyo_theme',
 } as const;

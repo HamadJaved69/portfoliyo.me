@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Globe, Github, Linkedin, ExternalLink, ChevronRight } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Github, Linkedin, ExternalLink, ChevronRight, Twitter } from 'lucide-react';
 import type { Portfolio } from '../types';
 
 interface TemplateProps {
@@ -7,8 +7,14 @@ interface TemplateProps {
   isPreview?: boolean;
 }
 
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
 const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false }) => {
-  const { personalInfo, experience, education, skills, projects } = portfolio;
+  const { experiences, education, skills, projects } = portfolio;
 
   return (
     <div className="min-h-screen bg-white text-black font-mono">
@@ -19,12 +25,14 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
             {/* Main Info */}
             <div className="lg:col-span-2">
               <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight">
-                {personalInfo.name}
+                {portfolio.title || 'My Portfolio'}
               </h1>
-              <p className="text-2xl text-gray-300 mb-6">{personalInfo.title}</p>
-              {personalInfo.summary && (
-                <p className="text-lg text-gray-400 leading-relaxed max-w-2xl">
-                  {personalInfo.summary}
+              {portfolio.tagline && (
+                <p className="text-2xl text-gray-300 mb-6">{portfolio.tagline}</p>
+              )}
+              {portfolio.bio && (
+                <p className="text-lg text-gray-400 leading-relaxed max-w-2xl whitespace-pre-line">
+                  {portfolio.bio}
                 </p>
               )}
             </div>
@@ -33,55 +41,66 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
             <div className="bg-white bg-opacity-10 border border-white border-opacity-20 p-6">
               <h3 className="text-lg font-bold mb-4 text-gray-300">CONTACT</h3>
               <div className="space-y-3 text-sm">
-                {personalInfo.email && (
-                  <a href={`mailto:${personalInfo.email}`} className="flex items-center hover:text-gray-300 transition-colors">
+                {portfolio.contactEmail && (
+                  <a href={`mailto:${portfolio.contactEmail}`} className="flex items-center hover:text-gray-300 transition-colors">
                     <Mail className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.email}
+                    {portfolio.contactEmail}
                   </a>
                 )}
-                {personalInfo.phone && (
-                  <a href={`tel:${personalInfo.phone}`} className="flex items-center hover:text-gray-300 transition-colors">
+                {portfolio.contactPhone && (
+                  <a href={`tel:${portfolio.contactPhone}`} className="flex items-center hover:text-gray-300 transition-colors">
                     <Phone className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.phone}
+                    {portfolio.contactPhone}
                   </a>
                 )}
-                {personalInfo.location && (
+                {portfolio.location && (
                   <div className="flex items-center">
                     <MapPin className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.location}
+                    {portfolio.location}
                   </div>
                 )}
-                {personalInfo.website && (
+                {portfolio.websiteUrl && (
                   <a
-                    href={personalInfo.website}
+                    href={portfolio.websiteUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center hover:text-gray-300 transition-colors"
                   >
                     <Globe className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.website.replace(/^https?:\/\//, '')}
+                    Website
                   </a>
                 )}
-                {personalInfo.github && (
+                {portfolio.githubUrl && (
                   <a
-                    href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`}
+                    href={portfolio.githubUrl.startsWith('http') ? portfolio.githubUrl : `https://${portfolio.githubUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center hover:text-gray-300 transition-colors"
                   >
                     <Github className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.github.replace(/^https?:\/\//, '')}
+                    GitHub
                   </a>
                 )}
-                {personalInfo.linkedin && (
+                {portfolio.linkedinUrl && (
                   <a
-                    href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}
+                    href={portfolio.linkedinUrl.startsWith('http') ? portfolio.linkedinUrl : `https://${portfolio.linkedinUrl}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center hover:text-gray-300 transition-colors"
                   >
                     <Linkedin className="w-4 h-4 mr-3 flex-shrink-0" />
-                    {personalInfo.linkedin.replace(/^https?:\/\//, '')}
+                    LinkedIn
+                  </a>
+                )}
+                {portfolio.twitterUrl && (
+                  <a
+                    href={portfolio.twitterUrl.startsWith('http') ? portfolio.twitterUrl : `https://${portfolio.twitterUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center hover:text-gray-300 transition-colors"
+                  >
+                    <Twitter className="w-4 h-4 mr-3 flex-shrink-0" />
+                    Twitter
                   </a>
                 )}
               </div>
@@ -92,7 +111,7 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
 
       <div className="max-w-6xl mx-auto px-6">
         {/* Experience */}
-        {experience.length > 0 && (
+        {experiences && experiences.length > 0 && (
           <section className="py-20 border-b border-gray-200">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
               <div className="lg:col-span-1">
@@ -101,27 +120,22 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
                 </h2>
               </div>
               <div className="lg:col-span-3 space-y-12">
-                {experience.map((exp, index) => (
-                  <div key={index} className="relative">
+                {experiences.map((exp) => (
+                  <div key={exp.id} className="relative">
                     <div className="flex items-start">
                       <ChevronRight className="w-6 h-6 mr-4 mt-1 flex-shrink-0" />
                       <div className="flex-1">
-                        <h3 className="text-2xl font-bold mb-2">{exp.title}</h3>
+                        <h3 className="text-2xl font-bold mb-2">{exp.position}</h3>
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                           <p className="text-lg text-gray-700 font-medium">{exp.company}</p>
                           <p className="text-sm text-gray-500 bg-gray-100 px-3 py-1 border border-black inline-block sm:ml-4">
-                            {exp.duration}
+                            {formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}
                           </p>
                         </div>
-                        {exp.description && exp.description.length > 0 && (
-                          <div className="space-y-3">
-                            {exp.description.map((desc, i) => (
-                              <p key={i} className="text-gray-700 leading-relaxed flex items-start">
-                                <span className="w-2 h-2 bg-black flex-shrink-0 mt-2 mr-3"></span>
-                                {desc}
-                              </p>
-                            ))}
-                          </div>
+                        {exp.description && (
+                          <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                            {exp.description}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -133,7 +147,7 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
         )}
 
         {/* Skills */}
-        {skills.length > 0 && (
+        {skills && skills.length > 0 && (
           <section className="py-20 border-b border-gray-200">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
               <div className="lg:col-span-1">
@@ -158,7 +172,7 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
         )}
 
         {/* Projects */}
-        {projects.length > 0 && (
+        {projects && projects.length > 0 && (
           <section className="py-20 border-b border-gray-200">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
               <div className="lg:col-span-1">
@@ -167,25 +181,39 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
                 </h2>
               </div>
               <div className="lg:col-span-3 space-y-12">
-                {projects.map((project, index) => (
-                  <div key={index} className="bg-gray-50 border-l-4 border-black p-8">
+                {projects.map((project) => (
+                  <div key={project.id} className="bg-gray-50 border-l-4 border-black p-8">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-2xl font-bold">{project.title}</h3>
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-black text-white p-2 hover:bg-gray-800 transition-colors"
-                        >
-                          <ExternalLink className="w-5 h-5" />
-                        </a>
-                      )}
+                      <div className="flex gap-2">
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white p-2 hover:bg-gray-800 transition-colors"
+                          >
+                            <Github className="w-5 h-5" />
+                          </a>
+                        )}
+                        {project.projectUrl && (
+                          <a
+                            href={project.projectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-black text-white p-2 hover:bg-gray-800 transition-colors"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-gray-700 leading-relaxed mb-6">
-                      {project.description}
-                    </p>
-                    {project.technologies.length > 0 && (
+                    {project.description && (
+                      <p className="text-gray-700 leading-relaxed mb-6">
+                        {project.description}
+                      </p>
+                    )}
+                    {project.technologies && project.technologies.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {project.technologies.map((tech, i) => (
                           <span
@@ -205,7 +233,7 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
         )}
 
         {/* Education */}
-        {education.length > 0 && (
+        {education && education.length > 0 && (
           <section className="py-20">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
               <div className="lg:col-span-1">
@@ -214,13 +242,18 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
                 </h2>
               </div>
               <div className="lg:col-span-3 space-y-8">
-                {education.map((edu, index) => (
-                  <div key={index} className="border border-black p-6 bg-white">
-                    <h3 className="text-xl font-bold mb-2">{edu.degree}</h3>
+                {education.map((edu) => (
+                  <div key={edu.id} className="border border-black p-6 bg-white">
+                    <h3 className="text-xl font-bold mb-2">
+                      {edu.degree}{edu.field && ` in ${edu.field}`}
+                    </h3>
                     <p className="text-gray-700 text-lg">{edu.institution}</p>
                     <p className="text-sm text-gray-500 bg-gray-100 px-2 py-1 inline-block mt-2 border border-gray-300">
-                      {edu.year}
+                      {formatDate(edu.startDate)} - {formatDate(edu.endDate) || 'Present'}
                     </p>
+                    {edu.description && (
+                      <p className="text-gray-600 mt-3">{edu.description}</p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -232,7 +265,7 @@ const ModernTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false 
       {/* Footer */}
       <footer className="bg-black text-white py-12">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <p className="text-lg font-bold mb-2">{personalInfo.name}</p>
+          <p className="text-lg font-bold mb-2">{portfolio.title}</p>
           <p className="text-gray-400">
             © {new Date().getFullYear()} All rights reserved
           </p>

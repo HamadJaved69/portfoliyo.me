@@ -9,7 +9,7 @@ import { validateProfileForm, getFieldError } from '../../lib/validation';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import type { User as UserType, UpdateProfileData, ValidationError } from '../../types';
+import type { UpdateProfileData, ValidationError } from '../../types';
 
 interface PasswordChangeData {
   currentPassword: string;
@@ -19,7 +19,7 @@ interface PasswordChangeData {
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, updateUser, logout } = useAuth();
+  const { user, updateUser } = useAuth();
   const { showError, showSuccess } = useToast();
 
   // Profile form state
@@ -98,8 +98,8 @@ const Profile = () => {
     setErrors([]);
 
     try {
-      const response = await apiClient.put(API_ENDPOINTS.USERS.PROFILE, profileData);
-      
+      const response = await apiClient.put(API_ENDPOINTS.AUTH.PROFILE, profileData);
+
       if (response.success && response.data) {
         updateUser(response.data);
         showSuccess('Profile updated', 'Your profile information has been updated successfully.');
@@ -147,11 +147,11 @@ const Profile = () => {
     setErrors([]);
 
     try {
-      await apiClient.put(API_ENDPOINTS.USERS.CHANGE_PASSWORD, {
-        currentPassword: passwordData.currentPassword,
+      await apiClient.post(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, {
+        oldPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       });
-      
+
       showSuccess('Password changed', 'Your password has been updated successfully.');
       setPasswordData({
         currentPassword: '',
@@ -172,21 +172,9 @@ const Profile = () => {
   };
 
   const handleDeleteAccount = async () => {
-    setLoading(prev => ({ ...prev, delete: true }));
-
-    try {
-      await apiClient.delete(API_ENDPOINTS.USERS.DELETE);
-      showSuccess('Account deleted', 'Your account has been deleted successfully.');
-      logout();
-      navigate('/', { replace: true });
-    } catch (error) {
-      console.error('Account deletion error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Account deletion failed';
-      showError('Deletion Failed', errorMessage);
-    } finally {
-      setLoading(prev => ({ ...prev, delete: false }));
-      setShowDeleteConfirmation(false);
-    }
+    // Account deletion not currently supported by API
+    showError('Not Available', 'Account deletion is not currently available. Please contact support.');
+    setShowDeleteConfirmation(false);
   };
 
   if (!user) {

@@ -13,14 +13,17 @@ export interface TemplateConfig {
   preview: {
     name: string;
     title: string;
+    tagline: string;
     location: string;
     email: string;
-    summary: string;
+    bio: string;
     skills: string[];
     experience: Array<{
-      title: string;
+      position: string;
       company: string;
-      duration: string;
+      startDate: string;
+      endDate: string | null;
+      current: boolean;
       description: string;
     }>;
   };
@@ -35,16 +38,19 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     component: MinimalTemplate,
     preview: {
       name: 'John Doe',
-      title: 'Full Stack Developer',
+      title: 'John Doe - Full Stack Developer',
+      tagline: 'Building the future, one line at a time',
       location: 'Remote',
       email: 'john@example.com',
-      summary: 'Building scalable web applications with modern technologies. Passionate about clean code and user experience.',
+      bio: 'Building scalable web applications with modern technologies. Passionate about clean code and user experience.',
       skills: ['JavaScript', 'React', 'Node.js', 'PostgreSQL', 'Docker'],
       experience: [
         {
-          title: 'Senior Developer',
+          position: 'Senior Developer',
           company: 'TechCorp',
-          duration: '2022 - Present',
+          startDate: '2022-01-01',
+          endDate: null,
+          current: true,
           description: 'Lead development of microservices architecture serving 100k+ users.'
         }
       ]
@@ -58,16 +64,19 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     component: ModernTemplate,
     preview: {
       name: 'Sarah Chen',
-      title: 'Product Designer',
+      title: 'Sarah Chen - Product Designer',
+      tagline: 'Creating intuitive experiences',
       location: 'San Francisco, CA',
       email: 'sarah@example.com',
-      summary: 'Creating intuitive user experiences for digital products. Expertise in design systems and user research.',
+      bio: 'Creating intuitive user experiences for digital products. Expertise in design systems and user research.',
       skills: ['Figma', 'React', 'TypeScript', 'Design Systems', 'User Research'],
       experience: [
         {
-          title: 'Product Designer',
+          position: 'Product Designer',
           company: 'StartupXYZ',
-          duration: '2021 - Present',
+          startDate: '2021-01-01',
+          endDate: null,
+          current: true,
           description: 'Design and prototype user interfaces for mobile and web applications.'
         }
       ]
@@ -81,16 +90,19 @@ export const TEMPLATES: Record<string, TemplateConfig> = {
     component: DeveloperTemplate,
     preview: {
       name: 'Alex Kumar',
-      title: 'DevOps Engineer',
+      title: 'Alex Kumar - DevOps Engineer',
+      tagline: 'Automating everything',
       location: 'Austin, TX',
       email: 'alex@example.com',
-      summary: 'Automating infrastructure and improving deployment pipelines. Love working with cloud technologies.',
+      bio: 'Automating infrastructure and improving deployment pipelines. Love working with cloud technologies.',
       skills: ['AWS', 'Kubernetes', 'Terraform', 'Python', 'CI/CD'],
       experience: [
         {
-          title: 'DevOps Engineer',
+          position: 'DevOps Engineer',
           company: 'CloudFirst',
-          duration: '2020 - Present',
+          startDate: '2020-01-01',
+          endDate: null,
+          current: true,
           description: 'Manage cloud infrastructure and deployment pipelines serving 1M+ users.'
         }
       ]
@@ -121,57 +133,86 @@ export const getPremiumTemplates = (): TemplateConfig[] => {
 
 // Sample portfolio data for previews
 export const createSamplePortfolio = (preview: TemplateConfig['preview']): Portfolio => ({
-  id: 0,
-  userId: 0,
-  title: `${preview.name}'s Portfolio`,
-  slug: preview.name.toLowerCase().replace(/\s+/g, ''),
-  personalInfo: {
-    name: preview.name,
-    title: preview.title,
-    email: preview.email,
-    phone: '+1 (555) 123-4567',
-    location: preview.location,
-    website: `https://${preview.name.toLowerCase().replace(/\s+/g, '')}.dev`,
-    github: `github.com/${preview.name.toLowerCase().replace(/\s+/g, '')}`,
-    linkedin: `linkedin.com/in/${preview.name.toLowerCase().replace(/\s+/g, '')}`,
-    summary: preview.summary
-  },
-  experience: preview.experience.map(exp => ({
-    id: 1,
-    title: exp.title,
+  id: 'sample-id',
+  userId: 'sample-user-id',
+  title: preview.title,
+  bio: preview.bio,
+  tagline: preview.tagline,
+  template: 'minimal',
+  contactEmail: preview.email,
+  contactPhone: '+1 (555) 123-4567',
+  location: preview.location,
+  websiteUrl: `https://${preview.name.toLowerCase().replace(/\s+/g, '')}.dev`,
+  githubUrl: `https://github.com/${preview.name.toLowerCase().replace(/\s+/g, '')}`,
+  linkedinUrl: `https://linkedin.com/in/${preview.name.toLowerCase().replace(/\s+/g, '')}`,
+  twitterUrl: null,
+  skills: preview.skills,
+  isPublished: true,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  experiences: preview.experience.map((exp, index) => ({
+    id: `exp-${index}`,
+    portfolioId: 'sample-id',
     company: exp.company,
-    duration: exp.duration,
-    description: [exp.description]
+    position: exp.position,
+    description: exp.description,
+    location: null,
+    current: exp.current,
+    order: index,
+    startDate: exp.startDate,
+    endDate: exp.endDate,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   })),
   education: [
     {
-      id: 1,
-      degree: 'Computer Science, B.S.',
+      id: 'edu-1',
+      portfolioId: 'sample-id',
       institution: 'Tech University',
-      year: '2018'
+      degree: 'Bachelor of Science',
+      field: 'Computer Science',
+      description: null,
+      order: 0,
+      startDate: '2014-09-01',
+      endDate: '2018-06-01',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ],
-  skills: preview.skills,
   projects: [
     {
-      id: 1,
+      id: 'proj-1',
+      portfolioId: 'sample-id',
       title: 'Project Alpha',
       description: 'A full-stack web application with real-time features and modern architecture.',
+      imageUrl: null,
+      projectUrl: 'https://project-alpha.example.com',
+      githubUrl: 'https://github.com/example/project-alpha',
       technologies: preview.skills.slice(0, 3),
-      link: 'https://github.com/example/project-alpha'
+      featured: true,
+      order: 0,
+      startDate: null,
+      endDate: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      id: 2,
+      id: 'proj-2',
+      portfolioId: 'sample-id',
       title: 'Mobile App Beta',
       description: 'Cross-platform mobile application built with React Native and Node.js backend.',
+      imageUrl: null,
+      projectUrl: 'https://mobile-beta.example.com',
+      githubUrl: 'https://github.com/example/mobile-beta',
       technologies: preview.skills.slice(1, 4),
-      link: 'https://github.com/example/mobile-beta'
+      featured: false,
+      order: 1,
+      startDate: null,
+      endDate: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
-  ],
-  isPublic: true,
-  viewCount: 0,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString()
+  ]
 });
 
 export default TEMPLATES;

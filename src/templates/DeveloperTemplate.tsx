@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Globe, Github, Linkedin, ExternalLink, Terminal, Code, Folder } from 'lucide-react';
+import { Mail, Phone, Globe, Github, Linkedin, ExternalLink, Terminal, Code, Folder, Twitter } from 'lucide-react';
 import type { Portfolio } from '../types';
 
 interface TemplateProps {
@@ -7,8 +7,15 @@ interface TemplateProps {
   isPreview?: boolean;
 }
 
+const formatDate = (dateString: string | null): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
 const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = false }) => {
-  const { personalInfo, experience, education, skills, projects } = portfolio;
+  const { experiences, education, skills, projects } = portfolio;
+  const displayName = portfolio.title?.split(' - ')[0] || portfolio.title || 'Developer';
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono">
@@ -22,7 +29,7 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             </div>
             <span className="text-green-300 text-sm">
-              {personalInfo.name.toLowerCase().replace(/\s+/g, '')}@portfoliyo:~$
+              {displayName.toLowerCase().replace(/\s+/g, '')}@portfoliyo:~$
             </span>
           </div>
         </div>
@@ -37,12 +44,12 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
             <span className="text-green-300">cat about.txt</span>
           </div>
           <div className="ml-6 space-y-2 text-green-400">
-            <p className="text-2xl font-bold">{personalInfo.name}</p>
-            <p className="text-lg">{personalInfo.title}</p>
-            {personalInfo.location && <p>📍 {personalInfo.location}</p>}
-            {personalInfo.summary && (
-              <p className="text-green-300 mt-4 max-w-3xl leading-relaxed">
-                {personalInfo.summary}
+            <p className="text-2xl font-bold">{portfolio.title || 'My Portfolio'}</p>
+            {portfolio.tagline && <p className="text-lg">{portfolio.tagline}</p>}
+            {portfolio.location && <p>📍 {portfolio.location}</p>}
+            {portfolio.bio && (
+              <p className="text-green-300 mt-4 max-w-3xl leading-relaxed whitespace-pre-line">
+                {portfolio.bio}
               </p>
             )}
           </div>
@@ -55,63 +62,77 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
             <span className="text-green-300">ls -la contact/</span>
           </div>
           <div className="ml-6 space-y-1 text-sm">
-            {personalInfo.email && (
+            {portfolio.contactEmail && (
               <div className="flex items-center">
                 <span className="text-green-600 mr-4">-rw-r--r--</span>
                 <Mail className="w-4 h-4 mr-2" />
-                <a href={`mailto:${personalInfo.email}`} className="hover:text-green-300">
-                  {personalInfo.email}
+                <a href={`mailto:${portfolio.contactEmail}`} className="hover:text-green-300">
+                  {portfolio.contactEmail}
                 </a>
               </div>
             )}
-            {personalInfo.phone && (
+            {portfolio.contactPhone && (
               <div className="flex items-center">
                 <span className="text-green-600 mr-4">-rw-r--r--</span>
                 <Phone className="w-4 h-4 mr-2" />
-                <a href={`tel:${personalInfo.phone}`} className="hover:text-green-300">
-                  {personalInfo.phone}
+                <a href={`tel:${portfolio.contactPhone}`} className="hover:text-green-300">
+                  {portfolio.contactPhone}
                 </a>
               </div>
             )}
-            {personalInfo.website && (
+            {portfolio.websiteUrl && (
               <div className="flex items-center">
                 <span className="text-green-600 mr-4">-rw-r--r--</span>
                 <Globe className="w-4 h-4 mr-2" />
                 <a
-                  href={personalInfo.website}
+                  href={portfolio.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-green-300"
                 >
-                  {personalInfo.website.replace(/^https?:\/\//, '')}
+                  {portfolio.websiteUrl.replace(/^https?:\/\//, '')}
                 </a>
               </div>
             )}
-            {personalInfo.github && (
+            {portfolio.githubUrl && (
               <div className="flex items-center">
                 <span className="text-green-600 mr-4">-rw-r--r--</span>
                 <Github className="w-4 h-4 mr-2" />
                 <a
-                  href={personalInfo.github.startsWith('http') ? personalInfo.github : `https://${personalInfo.github}`}
+                  href={portfolio.githubUrl.startsWith('http') ? portfolio.githubUrl : `https://${portfolio.githubUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-green-300"
                 >
-                  {personalInfo.github.replace(/^https?:\/\//, '')}
+                  GitHub
                 </a>
               </div>
             )}
-            {personalInfo.linkedin && (
+            {portfolio.linkedinUrl && (
               <div className="flex items-center">
                 <span className="text-green-600 mr-4">-rw-r--r--</span>
                 <Linkedin className="w-4 h-4 mr-2" />
                 <a
-                  href={personalInfo.linkedin.startsWith('http') ? personalInfo.linkedin : `https://${personalInfo.linkedin}`}
+                  href={portfolio.linkedinUrl.startsWith('http') ? portfolio.linkedinUrl : `https://${portfolio.linkedinUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-green-300"
                 >
-                  {personalInfo.linkedin.replace(/^https?:\/\//, '')}
+                  LinkedIn
+                </a>
+              </div>
+            )}
+            {portfolio.twitterUrl && (
+              <div className="flex items-center">
+                <span className="text-green-600 mr-4">-rw-r--r--</span>
+                <Twitter className="w-4 h-4 mr-2" />
+                <a
+                  href={portfolio.twitterUrl.startsWith('http') ? portfolio.twitterUrl : `https://${portfolio.twitterUrl}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-green-300"
+                >
+                  Twitter
                 </a>
               </div>
             )}
@@ -119,7 +140,7 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
         </div>
 
         {/* Skills */}
-        {skills.length > 0 && (
+        {skills && skills.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center mb-2">
               <Terminal className="w-4 h-4 mr-2" />
@@ -147,29 +168,27 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
         )}
 
         {/* Experience */}
-        {experience.length > 0 && (
+        {experiences && experiences.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center mb-2">
               <Terminal className="w-4 h-4 mr-2" />
               <span className="text-green-300">git log --oneline experience/</span>
             </div>
             <div className="ml-6 space-y-6">
-              {experience.map((exp, index) => (
-                <div key={index} className="border-l-2 border-green-400 pl-4">
+              {experiences.map((exp) => (
+                <div key={exp.id} className="border-l-2 border-green-400 pl-4">
                   <div className="flex items-center mb-2">
                     <Code className="w-4 h-4 mr-2 text-green-300" />
-                    <span className="text-yellow-400 text-sm">[{exp.duration}]</span>
-                    <span className="text-green-400 font-bold ml-2">{exp.title}</span>
+                    <span className="text-yellow-400 text-sm">
+                      [{formatDate(exp.startDate)} - {exp.current ? 'Present' : formatDate(exp.endDate)}]
+                    </span>
+                    <span className="text-green-400 font-bold ml-2">{exp.position}</span>
                   </div>
-                  <p className="text-green-300 mb-2"># {exp.company}</p>
-                  {exp.description && exp.description.length > 0 && (
-                    <div className="space-y-1 text-sm">
-                      {exp.description.map((desc, i) => (
-                        <p key={i} className="text-green-400">
-                          + {desc}
-                        </p>
-                      ))}
-                    </div>
+                  <p className="text-green-300 mb-2"># {exp.company}{exp.location && ` • ${exp.location}`}</p>
+                  {exp.description && (
+                    <p className="text-green-400 text-sm whitespace-pre-line">
+                      {exp.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -178,38 +197,55 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
         )}
 
         {/* Projects */}
-        {projects.length > 0 && (
+        {projects && projects.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center mb-2">
               <Terminal className="w-4 h-4 mr-2" />
               <span className="text-green-300">ls -la projects/</span>
             </div>
             <div className="ml-6 space-y-4">
-              {projects.map((project, index) => (
-                <div key={index} className="bg-gray-900 border border-green-400 p-4 rounded">
+              {projects.map((project) => (
+                <div key={project.id} className="bg-gray-900 border border-green-400 p-4 rounded">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
                       <Folder className="w-4 h-4 mr-2 text-blue-400" />
                       <span className="text-green-400 font-bold">{project.title}/</span>
+                      {project.featured && (
+                        <span className="ml-2 text-yellow-400 text-xs">★ featured</span>
+                      )}
                     </div>
-                    {project.link && (
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-300 hover:text-green-400 transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
+                    <div className="flex gap-2">
+                      {project.githubUrl && (
+                        <a
+                          href={project.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-300 hover:text-green-400 transition-colors"
+                        >
+                          <Github className="w-4 h-4" />
+                        </a>
+                      )}
+                      {project.projectUrl && (
+                        <a
+                          href={project.projectUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-300 hover:text-green-400 transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="mb-3">
-                    <span className="text-green-300"># </span>
-                    <span className="text-green-400">{project.description}</span>
-                  </div>
+                  {project.description && (
+                    <div className="mb-3">
+                      <span className="text-green-300"># </span>
+                      <span className="text-green-400">{project.description}</span>
+                    </div>
+                  )}
 
-                  {project.technologies.length > 0 && (
+                  {project.technologies && project.technologies.length > 0 && (
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="text-green-300">Dependencies:</span>
                       {project.technologies.map((tech, i) => (
@@ -229,19 +265,26 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
         )}
 
         {/* Education */}
-        {education.length > 0 && (
+        {education && education.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center mb-2">
               <Terminal className="w-4 h-4 mr-2" />
               <span className="text-green-300">cat education.log</span>
             </div>
             <div className="ml-6 space-y-3">
-              {education.map((edu, index) => (
-                <div key={index} className="flex items-start">
-                  <span className="text-green-600 mr-4 text-sm">[{edu.year}]</span>
+              {education.map((edu) => (
+                <div key={edu.id} className="flex items-start">
+                  <span className="text-green-600 mr-4 text-sm">
+                    [{formatDate(edu.startDate)} - {formatDate(edu.endDate) || 'Present'}]
+                  </span>
                   <div>
-                    <p className="text-green-400 font-bold">{edu.degree}</p>
+                    <p className="text-green-400 font-bold">
+                      {edu.degree}{edu.field && ` in ${edu.field}`}
+                    </p>
                     <p className="text-green-300 text-sm">{edu.institution}</p>
+                    {edu.description && (
+                      <p className="text-green-500 text-sm mt-1">{edu.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
@@ -257,7 +300,7 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
           </div>
           <div className="ml-6">
             <p className="text-green-400">
-              © {new Date().getFullYear()} {personalInfo.name} - Built with terminal love
+              © {new Date().getFullYear()} {portfolio.title} - Built with terminal love
             </p>
             {!isPreview && (
               <p className="text-green-600 text-xs mt-2">
