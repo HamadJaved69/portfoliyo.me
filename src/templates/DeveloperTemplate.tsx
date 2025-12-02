@@ -147,22 +147,20 @@ const DeveloperTemplate: React.FC<TemplateProps> = ({ portfolio, isPreview = fal
               <span className="text-green-300">cat skills.json</span>
             </div>
             <div className="ml-6 bg-gray-900 p-4 border border-green-400 rounded">
-              <div className="text-green-400">
-                <span className="text-green-300">{'{'}</span>
-                <div className="ml-4">
-                  <span className="text-blue-400">"technologies"</span>
-                  <span className="text-green-300">: [</span>
-                  <div className="ml-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 my-2">
-                    {skills.map((skill, index) => (
-                      <span key={index} className="text-yellow-400">
-                        "{skill}"{index < skills.length - 1 && ','}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-green-300">]</span>
-                </div>
+              <pre className="text-green-400">
+                <span className="text-green-300">{'{'}</span>{'\n'}
+                <span className="text-blue-400">  "technologies"</span>
+                <span className="text-green-300">: [</span>{'\n'}
+                {skills.map((skill, index) => (
+                  <span key={index}>
+                    <span className="text-yellow-400">    "{skill}"</span>
+                    {index < skills.length - 1 && <span className="text-green-300">,</span>}
+                    {'\n'}
+                  </span>
+                ))}
+                <span className="text-green-300">  ]</span>{'\n'}
                 <span className="text-green-300">{'}'}</span>
-              </div>
+              </pre>
             </div>
           </div>
         )}

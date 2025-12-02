@@ -12,7 +12,8 @@ import {
   LogOut,
   Globe,
   EyeOff,
-  AlertCircle
+  AlertCircle,
+  ImageIcon
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -20,6 +21,7 @@ import { apiClient } from '../../lib/api';
 import { API_ENDPOINTS } from '../../config/api';
 import Button from '../../components/ui/Button';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import ShareCard from '../../components/ShareCard';
 import type { Portfolio } from '../../types';
 
 const Dashboard = () => {
@@ -30,6 +32,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [showShareCard, setShowShareCard] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -210,14 +213,24 @@ const Dashboard = () => {
                   {portfolio.isPublished ? 'Unpublish' : 'Publish'}
                 </Button>
                 {portfolio.isPublished && user?.username && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    leftIcon={<Eye className="w-4 h-4" />}
-                    onClick={() => window.open(`/@${user.username}`, '_blank')}
-                  >
-                    View Live
-                  </Button>
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Eye className="w-4 h-4" />}
+                      onClick={() => window.open(`/@${user.username}`, '_blank')}
+                    >
+                      View Live
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<Share2 className="w-4 h-4" />}
+                      onClick={() => setShowShareCard(true)}
+                    >
+                      Share
+                    </Button>
+                  </>
                 )}
                 <Button
                   variant="outline"
@@ -321,20 +334,15 @@ const Dashboard = () => {
           <Button
             variant="outline"
             className="h-auto p-4 text-left"
-            disabled={!user?.username}
-            onClick={() => {
-              if (user?.username) {
-                navigator.clipboard.writeText(`${window.location.origin}/@${user.username}`);
-                showSuccess('Link Copied!', 'Portfolio link copied to clipboard');
-              }
-            }}
+            disabled={!user?.username || !portfolio}
+            onClick={() => setShowShareCard(true)}
           >
             <div className="flex items-center">
-              <Share2 className="w-5 h-5 mr-3" />
+              <ImageIcon className="w-5 h-5 mr-3" />
               <div>
-                <p className="font-medium">Share Portfolio</p>
+                <p className="font-medium">Share Card</p>
                 <p className="text-sm text-gray-600">
-                  {user?.username ? 'Copy portfolio link' : 'Set username first'}
+                  {user?.username ? 'Create shareable card' : 'Set username first'}
                 </p>
               </div>
             </div>
@@ -365,6 +373,17 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {renderOverview()}
       </main>
+
+      {/* Share Card Modal */}
+      {showShareCard && portfolio && user?.username && (
+        <ShareCard
+          username={user.username}
+          title={portfolio.title || ''}
+          tagline={portfolio.tagline}
+          template={portfolio.template}
+          onClose={() => setShowShareCard(false)}
+        />
+      )}
     </div>
   );
 };
